@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="Home"
+        android:id="@+id/mnu_home"
+        android:icon="@drawable/ic_action_home"/>
+    <item android:title="Events"
+        android:id="@+id/mnu_event"
+        android:icon="@drawable/ic_action_event"/>
+    <item android:title="Profile"
+        android:id="@+id/mnu_profile"
+        android:icon="@drawable/ic_action_profile"/>
+</menu>
