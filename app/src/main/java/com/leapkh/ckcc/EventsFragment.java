@@ -1,8 +1,10 @@
 package com.leapkh.ckcc;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,13 +26,23 @@ public class EventsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View home = inflater.inflate(R.layout.fragment_events,container,false);
+        View home = inflater.inflate(R.layout.fragment_events, container, false);
         return home;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        FloatingActionButton btnAddEvent = view.findViewById(R.id.btn_add_event);
+        btnAddEvent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), AddEventActivity.class);
+                startActivity(intent);
+            }
+        });
+
         RecyclerView recyclerView = view.findViewById(R.id.recyclerview);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
@@ -56,7 +68,7 @@ public class EventsFragment extends Fragment {
         requestQueue.add(request);
     }
 
-    class EventAdapter extends RecyclerView.Adapter<EventViewHolder>{
+    class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
         private Event[] events;
 
         public Event[] getEvents() {
@@ -72,7 +84,7 @@ public class EventsFragment extends Fragment {
         @Override
         public EventViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
-            View view = inflater.inflate(R.layout.viewholder_event,viewGroup,false);
+            View view = inflater.inflate(R.layout.viewholder_event, viewGroup, false);
             EventViewHolder eventViewHolder = new EventViewHolder(view);
 
             return eventViewHolder;
@@ -80,19 +92,20 @@ public class EventsFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull EventViewHolder eventViewHolder, int i) {
-            Event event=events[i];
+            Event event = events[i];
             eventViewHolder.textView.setText(event.getTitle());
         }
 
         @Override
         public int getItemCount() {
-            if(events==null){
+            if (events == null) {
                 return 0;
-            }else {
+            } else {
                 return events.length;
             }
         }
     }
+
     class EventViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
         TextView textView;

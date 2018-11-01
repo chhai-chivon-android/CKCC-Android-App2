@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "77583882131",
+    "firebase_url": "https://myapp-b4c81.firebaseio.com",
+    "project_id": "myapp-b4c81",
+    "storage_bucket": "myapp-b4c81.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:77583882131:android:ffb8fe78388038ac",
+        "android_client_info": {
+          "package_name": "com.leapkh.ckcc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "77583882131-1qs1q1g9ga5cpfo5et90i4stdtsafd7b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrjOa7RslePej0W9BKMVaDfZE2RgEHZKU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
