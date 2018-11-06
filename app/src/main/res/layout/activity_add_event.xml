@@ -26,6 +26,13 @@
             android:layout_height="wrap_content"
             android:hint="Location" />
 
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:id="@+id/img_event"
+            android:onClick="onEventImageViewClick"
+            android:src="@drawable/ic_image_defualt" />
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -7,6 +7,7 @@
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/imgEvent"
         android:layout_width="match_parent"
+        app:actualImageScaleType="fitCenter"
         android:layout_height="180dp"
         app:placeholderImage="@drawable/ic_image_defualt" />
 
