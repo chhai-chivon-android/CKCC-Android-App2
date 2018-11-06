@@ -98,9 +98,9 @@ public class AddEventActivity extends AppCompatActivity {
         });*/
 
 
-        db.collection("events").document("2").set(event).addOnCompleteListener(new OnCompleteListener<Void>() {
+        db.collection("events").add(event).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
             @Override
-            public void onComplete(@NonNull Task<Void> task) {
+            public void onComplete(@NonNull Task<DocumentReference> task) {
                 progressBar.setVisibility(View.GONE);
                 if (task.isSuccessful()) {
                     Toast.makeText(AddEventActivity.this, "Add event success", Toast.LENGTH_LONG).show();
@@ -110,7 +110,6 @@ public class AddEventActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
 
 }

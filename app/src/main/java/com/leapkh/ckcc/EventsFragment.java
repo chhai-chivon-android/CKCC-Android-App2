@@ -8,21 +8,34 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
 
 public class EventsFragment extends Fragment {
+
+    private EventAdapter eventAdapter;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -46,10 +59,14 @@ public class EventsFragment extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.recyclerview);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
-        final EventAdapter eventAdapter = new EventAdapter();
+        eventAdapter = new EventAdapter();
         recyclerView.setAdapter(eventAdapter);
 
-        //Load data
+        //loadEventsFromWebService();
+        loadEventsFromFirestore();
+    }
+
+    private void loadEventsFromWebService() {
         String url = "http://test.js-cambodia.com/ckcc/events.php";
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
         StringRequest request = new StringRequest(url, new Response.Listener<String>() {
@@ -66,6 +83,47 @@ public class EventsFragment extends Fragment {
             }
         });
         requestQueue.add(request);
+    }
+
+    private void loadEventsFromFirestore() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        // Non-realtime query
+        /*db.collection("events").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    Event[] events = new Event[task.getResult().size()];
+                    int index = 0;
+                    for (DocumentSnapshot documentSnapshot : task.getResult()) {
+                        Event event = documentSnapshot.toObject(Event.class);
+                        event.setId(documentSnapshot.getId());
+                        events[index] = event;
+                        index++;
+                    }
+                    eventAdapter.setEvents(events);
+                } else {
+                    Toast.makeText(getActivity(), "Load events fail.", Toast.LENGTH_LONG).show();
+                    Log.d("ckcc", "Load events fail: " + task.getException());
+                }
+            }
+        });*/
+
+        // Realtime query
+        db.collection("events").addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                Event[] events = new Event[queryDocumentSnapshots.size()];
+                int index = 0;
+                for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                    Event event = documentSnapshot.toObject(Event.class);
+                    event.setId(documentSnapshot.getId());
+                    events[index] = event;
+                    index++;
+                }
+                eventAdapter.setEvents(events);
+            }
+        });
+
     }
 
     class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
@@ -94,6 +152,7 @@ public class EventsFragment extends Fragment {
         public void onBindViewHolder(@NonNull EventViewHolder eventViewHolder, int i) {
             Event event = events[i];
             eventViewHolder.textView.setText(event.getTitle());
+            eventViewHolder.simpleDraweeView.setImageURI(event.getImageUrl());
         }
 
         @Override
@@ -107,12 +166,12 @@ public class EventsFragment extends Fragment {
     }
 
     class EventViewHolder extends RecyclerView.ViewHolder {
-        ImageView imageView;
+        SimpleDraweeView simpleDraweeView;
         TextView textView;
 
         public EventViewHolder(@NonNull View itemView) {
             super(itemView);
-            imageView = itemView.findViewById(R.id.imgviewholder);
+            simpleDraweeView = itemView.findViewById(R.id.imgEvent);
             textView = itemView.findViewById(R.id.tvtitle);
 
 

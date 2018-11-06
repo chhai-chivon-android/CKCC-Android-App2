@@ -1,14 +1,16 @@
 package com.leapkh.ckcc;
 
 public class Event {
-    private int id;
-    private String title;
 
-    public int getId() {
+    private String id;
+    private String title;
+    private String imageUrl;
+
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -18,5 +20,13 @@ public class Event {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

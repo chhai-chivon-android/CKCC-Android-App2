@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="180dp">
 
-    <ImageView
-        android:id="@+id/imgviewholder"
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/imgEvent"
         android:layout_width="match_parent"
         android:layout_height="180dp"
-        android:src="@drawable/ic_image_defualt"
-        />
+        app:placeholderImage="@drawable/ic_image_defualt" />
+
     <TextView
         android:id="@+id/tvtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Title"
         android:layout_alignParentBottom="true"
-        />
+        android:text="Title" />
 
 </RelativeLayout>
