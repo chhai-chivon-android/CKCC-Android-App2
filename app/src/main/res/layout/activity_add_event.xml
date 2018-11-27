@@ -24,12 +24,19 @@
             android:id="@+id/etxt_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Location" />
+            android:hint="Location Name" />
+
+        <EditText
+            android:id="@+id/etxt_coordinate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:hint="Coordinate" />
 
         <ImageView
+            android:id="@+id/img_event"
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:id="@+id/img_event"
             android:onClick="onEventImageViewClick"
             android:src="@drawable/ic_image_defualt" />
 
