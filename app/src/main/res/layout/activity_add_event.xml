@@ -21,17 +21,28 @@
             android:hint="Date" />
 
         <EditText
-            android:id="@+id/etxt_location"
+            android:id="@+id/etxt_address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Location Name" />
+            android:hint="Address" />
 
-        <EditText
-            android:id="@+id/etxt_coordinate"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:enabled="false"
-            android:hint="Coordinate" />
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onPickOnMapClick"
+                android:text="Pick on Map" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onSearchByNameClick"
+                android:text="Search by Name" />
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/img_event"

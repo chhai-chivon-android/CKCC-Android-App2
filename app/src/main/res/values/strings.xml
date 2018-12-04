@@ -2,5 +2,6 @@
     <string name="app_name">CKCC</string>
 
     <string name="facebook_app_id">192789361625540</string>
+    <string name="google_map_api_key">AIzaSyDkTSBZtni18ExTbALKnBP7rHx36Uv9Yww</string>
 
 </resources>

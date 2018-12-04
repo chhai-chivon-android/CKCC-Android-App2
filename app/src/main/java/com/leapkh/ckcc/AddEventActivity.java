@@ -5,8 +5,11 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -44,20 +47,24 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 
 public class AddEventActivity extends AppCompatActivity {
 
     private final int GALLERY_REQUEST_CODE = 1;
-    private final int LOCATION_PERMISSION_REQUEST_CODE = 2;
+    private final int MAP_REQUEST_CODE = 2;
+
 
     private ImageView imgEvent;
     private ProgressBar progressBar;
     private Bitmap selectedImage;
-    private EditText etxtCoornidate;
+    private EditText etxtAddress;
 
-    private FusedLocationProviderClient locationProviderClient;
+    private double selectedLat;
+    private double selectedLng;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,73 +73,20 @@ public class AddEventActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_event);
         imgEvent = findViewById(R.id.img_event);
         progressBar = findViewById(R.id.progressBar);
-        etxtCoornidate = findViewById(R.id.etxt_coordinate);
-
-        loadUserCurrentLocation();
+        etxtAddress = findViewById(R.id.etxt_address);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                loadUserCurrentLocation();
-            } else {
-                Toast.makeText(this, "This app cannot work properly without location permission. You should allow it.", Toast.LENGTH_LONG).show();
-            }
-        }
+    public void onPickOnMapClick(View view) {
+        Intent intent = new Intent(this, MapActivity.class);
+        //startActivity(intent);
+        startActivityForResult(intent, MAP_REQUEST_CODE);
     }
 
-    private void loadUserCurrentLocation() {
-        locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-            ActivityCompat.requestPermissions(this, permissions, LOCATION_PERMISSION_REQUEST_CODE);
-            return;
-        }
-        Task<Location> locationTask = locationProviderClient.getLastLocation();
-        locationTask.addOnCompleteListener(new OnCompleteListener<Location>() {
-            @Override
-            public void onComplete(@NonNull Task<Location> task) {
-                if (task.isSuccessful()) {
-                    Location location = task.getResult();
-                    if (location != null) {
-                        etxtCoornidate.setText(location.getLatitude() + ", " + location.getLongitude());
-                    } else {
-                        Toast.makeText(AddEventActivity.this, "Load last known location not found.", Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(AddEventActivity.this, "Load last known location fail.", Toast.LENGTH_LONG).show();
-                    Log.d("ckcc", "Load last known location fail: " + task.getException());
-                }
-                requestLocationUpdate();
-            }
-        });
+    public void onSearchByNameClick(View view){
+
     }
 
-    @SuppressLint("MissingPermission")
-    private void requestLocationUpdate() {
-        Log.d("ckcc", "requestLocationUpdate");
-        LocationRequest request = new LocationRequest();
-        request.setInterval(10000);
-        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        LocationCallback locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                super.onLocationResult(locationResult);
-                Log.d("ckcc", "Location updated.");
-                Toast.makeText(AddEventActivity.this, "Location updated.", Toast.LENGTH_LONG).show();
-                Location updatedLocation = locationResult.getLastLocation();
-                Log.d("ckcc", updatedLocation.getLatitude() + ", " + updatedLocation.getLongitude());
-                etxtCoornidate.setText(updatedLocation.getLatitude() + ", " + updatedLocation.getLongitude());
-                locationProviderClient.removeLocationUpdates(this);
-            }
-        };
-
-        locationProviderClient.requestLocationUpdates(request, locationCallback, null);
-    }
 
     public void onSaveButtonClick(View view) {
         progressBar.setVisibility(View.VISIBLE);
@@ -168,11 +122,9 @@ public class AddEventActivity extends AppCompatActivity {
     private void addEventToFirestore(String imageUrl) {
         EditText etxtTitle = findViewById(R.id.etxt_title);
         EditText etxtDate = findViewById(R.id.etxt_date);
-        EditText etxtLocation = findViewById(R.id.etxt_location);
 
         final String title = etxtTitle.getText().toString();
         final String date = etxtDate.getText().toString();
-        final String location = etxtLocation.getText().toString();
 
         // Add event to Web service
         /*
@@ -209,7 +161,6 @@ public class AddEventActivity extends AppCompatActivity {
         Map<String, Object> event = new HashMap<>();
         event.put("title", title);
         event.put("date", date);
-        event.put("location", location);
         event.put("imageUrl", imageUrl);
 
         /*db.collection("events").add(event).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
@@ -249,7 +200,11 @@ public class AddEventActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == GALLERY_REQUEST_CODE && resultCode == RESULT_OK) {
+        if (resultCode != RESULT_OK) {
+            return;
+        }
+
+        if (requestCode == GALLERY_REQUEST_CODE) {
             try {
                 selectedImage = MediaStore.Images.Media.getBitmap(getContentResolver(), data.getData());
                 imgEvent.setImageBitmap(selectedImage);
@@ -257,7 +212,45 @@ public class AddEventActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+
+        if (requestCode == MAP_REQUEST_CODE) {
+            double lat = data.getDoubleExtra("lat", 0);
+            double lng = data.getDoubleExtra("lng", 0);
+            selectedLat = lat;
+            selectedLng = lng;
+            reverseGeocode(lat, lng);
+        }
+
     }
+
+
+    private void reverseGeocode(final double lat, final double lng) {
+        Log.d("ckcc", "reverseGeocode");
+        final Geocoder geocoder = new Geocoder(this, new Locale("km"));
+        Thread geocodeThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+                    final Address address = addresses.get(0);
+                    //etxtAddress.setText(address.getAddressLine(0));
+                    Log.d("ckcc", "Address: " + address.toString());
+                    // Dispatch background thread to main thread
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            etxtAddress.setText(address.getAddressLine(0));
+                        }
+                    });
+                } catch (IOException e) {
+                    Toast.makeText(AddEventActivity.this, "Error while trying to reverse geocode.", Toast.LENGTH_SHORT).show();
+                    Log.d("ckcc", "reverseGeocode error: " + e.getMessage());
+                }
+            }
+        });
+        geocodeThread.start();
+    }
+
 }
 
 
