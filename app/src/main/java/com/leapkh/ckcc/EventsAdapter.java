@@ -10,17 +10,34 @@ import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewHolder> {
 
     private OnRecyclerViewItemClickListener onRecyclerViewItemClickListener;
-    private Event[] events;
+    private Event[] allEvents;
+    private Event[] eventsToShow;
 
     public void setOnRecyclerViewItemClickListener(OnRecyclerViewItemClickListener onRecyclerViewItemClickListener) {
         this.onRecyclerViewItemClickListener = onRecyclerViewItemClickListener;
     }
 
     public void setEvents(Event[] events) {
-        this.events = events;
+        allEvents = events;
+        eventsToShow = events;
+        notifyDataSetChanged();
+    }
+
+    public void search(String keyword){
+        List<Event> foundEvents = new ArrayList<>();
+        for (Event event : allEvents){
+            if(event.getTitle().toLowerCase().contains(keyword.toLowerCase())){
+                foundEvents.add(event);
+            }
+        }
+        eventsToShow = new Event[foundEvents.size()];
+        foundEvents.toArray(eventsToShow);
         notifyDataSetChanged();
     }
 
@@ -36,17 +53,17 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
 
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder eventViewHolder, int i) {
-        Event event = events[i];
+        Event event = eventsToShow[i];
         eventViewHolder.textView.setText(event.getTitle());
         eventViewHolder.simpleDraweeView.setImageURI(event.getImageUrl());
     }
 
     @Override
     public int getItemCount() {
-        if (events == null) {
+        if (eventsToShow == null) {
             return 0;
         } else {
-            return events.length;
+            return eventsToShow.length;
         }
     }
 

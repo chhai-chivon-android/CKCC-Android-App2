@@ -7,7 +7,8 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_marginTop="48dp" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/btn_add_event"
@@ -16,5 +17,11 @@
         android:layout_gravity="bottom|right"
         android:layout_margin="16dp"
         android:src="@drawable/ic_action_add" />
+
+    <EditText
+        android:id="@+id/etxt_search"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Search events ..." />
 
 </FrameLayout>

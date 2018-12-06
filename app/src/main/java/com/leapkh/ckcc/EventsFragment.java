@@ -8,11 +8,14 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -33,9 +36,10 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
 
-public class EventsFragment extends Fragment implements OnRecyclerViewItemClickListener {
+public class EventsFragment extends Fragment implements OnRecyclerViewItemClickListener, TextWatcher {
 
     private EventsAdapter eventAdapter;
+    private EditText etxtSearch;
 
     @Nullable
     @Override
@@ -47,6 +51,9 @@ public class EventsFragment extends Fragment implements OnRecyclerViewItemClickL
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        etxtSearch = view.findViewById(R.id.etxt_search);
+        etxtSearch.addTextChangedListener(this);
 
         FloatingActionButton btnAddEvent = view.findViewById(R.id.btn_add_event);
         btnAddEvent.setOnClickListener(new View.OnClickListener() {
@@ -140,6 +147,24 @@ public class EventsFragment extends Fragment implements OnRecyclerViewItemClickL
         PopupMenu popupMenu = new PopupMenu(getActivity(), optionView);
         popupMenu.inflate(R.menu.menu_event_option);
         popupMenu.show();
+    }
+
+    // TextWatcher
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+        Log.d("ckcc", "afterTextChanged: " + s.toString());
+        String keyword = s.toString();
+        eventAdapter.search(keyword);
     }
 }
 
