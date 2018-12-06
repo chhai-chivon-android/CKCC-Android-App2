@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,9 +33,9 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
 
-public class EventsFragment extends Fragment {
+public class EventsFragment extends Fragment implements OnRecyclerViewItemClickListener {
 
-    private EventAdapter eventAdapter;
+    private EventsAdapter eventAdapter;
 
     @Nullable
     @Override
@@ -59,7 +60,8 @@ public class EventsFragment extends Fragment {
         RecyclerView recyclerView = view.findViewById(R.id.recyclerview);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
-        eventAdapter = new EventAdapter();
+        eventAdapter = new EventsAdapter();
+        eventAdapter.setOnRecyclerViewItemClickListener(this);
         recyclerView.setAdapter(eventAdapter);
 
         //loadEventsFromWebService();
@@ -119,62 +121,39 @@ public class EventsFragment extends Fragment {
                     event.setId(documentSnapshot.getId());
                     events[index] = event;
                     index++;
-                }
+                };
                 eventAdapter.setEvents(events);
             }
         });
 
     }
 
-    class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
-        private Event[] events;
-
-        public Event[] getEvents() {
-            return events;
-        }
-
-        public void setEvents(Event[] events) {
-            this.events = events;
-            notifyDataSetChanged();
-        }
-
-        @NonNull
-        @Override
-        public EventViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-            LayoutInflater inflater = LayoutInflater.from(getActivity());
-            View view = inflater.inflate(R.layout.viewholder_event, viewGroup, false);
-            EventViewHolder eventViewHolder = new EventViewHolder(view);
-
-            return eventViewHolder;
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull EventViewHolder eventViewHolder, int i) {
-            Event event = events[i];
-            eventViewHolder.textView.setText(event.getTitle());
-            eventViewHolder.simpleDraweeView.setImageURI(event.getImageUrl());
-        }
-
-        @Override
-        public int getItemCount() {
-            if (events == null) {
-                return 0;
-            } else {
-                return events.length;
-            }
-        }
+    @Override
+    public void onRecyclerViewItemClick(int position) {
+        Toast.makeText(getActivity(), "onRecyclerViewItemClick: " + position, Toast.LENGTH_SHORT).show();
     }
 
-    class EventViewHolder extends RecyclerView.ViewHolder {
-        SimpleDraweeView simpleDraweeView;
-        TextView textView;
-
-        public EventViewHolder(@NonNull View itemView) {
-            super(itemView);
-            simpleDraweeView = itemView.findViewById(R.id.imgEvent);
-            textView = itemView.findViewById(R.id.tvtitle);
-
-
-        }
+    @Override
+    public void onRecyclerViewOptionItemClick(int position, View optionView) {
+        Toast.makeText(getActivity(), "onRecyclerViewItemLongClick: " + position, Toast.LENGTH_SHORT).show();
+        // Show option popup menu
+        PopupMenu popupMenu = new PopupMenu(getActivity(), optionView);
+        popupMenu.inflate(R.menu.menu_event_option);
+        popupMenu.show();
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
