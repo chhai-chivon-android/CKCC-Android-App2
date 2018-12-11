@@ -41,10 +41,9 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
 
-public class EventsFragment extends Fragment implements OnRecyclerViewItemClickListener, TextWatcher {
+public class EventsFragment extends Fragment implements OnRecyclerViewItemClickListener {
 
     private EventsAdapter eventAdapter;
-    private EditText etxtSearch;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,9 +62,6 @@ public class EventsFragment extends Fragment implements OnRecyclerViewItemClickL
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        etxtSearch = view.findViewById(R.id.etxt_search);
-        etxtSearch.addTextChangedListener(this);
 
         FloatingActionButton btnAddEvent = view.findViewById(R.id.btn_add_event);
         btnAddEvent.setOnClickListener(new View.OnClickListener() {
@@ -174,7 +170,13 @@ public class EventsFragment extends Fragment implements OnRecyclerViewItemClickL
 
     @Override
     public void onRecyclerViewItemClick(int position) {
-        Toast.makeText(getActivity(), "onRecyclerViewItemClick: " + position, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity(), "onRecyclerViewItemClick: " + position, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(getActivity(), EventDetailActivity.class);
+        Event event = eventAdapter.getEventsToShow()[position];
+        Gson gson = new Gson();
+        String eventJson = gson.toJson(event);
+        intent.putExtra("eventJson", eventJson);
+        startActivity(intent);
     }
 
     @Override
@@ -186,23 +188,6 @@ public class EventsFragment extends Fragment implements OnRecyclerViewItemClickL
         popupMenu.show();
     }
 
-    // TextWatcher
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-        Log.d("ckcc", "afterTextChanged: " + s.toString());
-        String keyword = s.toString();
-        eventAdapter.search(keyword);
-    }
 }
 
 

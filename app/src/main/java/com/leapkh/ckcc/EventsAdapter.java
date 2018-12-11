@@ -29,6 +29,10 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         notifyDataSetChanged();
     }
 
+    public Event[] getEventsToShow() {
+        return eventsToShow;
+    }
+
     public void search(String keyword){
         List<Event> foundEvents = new ArrayList<>();
         for (Event event : allEvents){
