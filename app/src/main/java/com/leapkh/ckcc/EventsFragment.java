@@ -6,12 +6,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
@@ -40,6 +45,13 @@ public class EventsFragment extends Fragment implements OnRecyclerViewItemClickL
 
     private EventsAdapter eventAdapter;
     private EditText etxtSearch;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
+    }
 
     @Nullable
     @Override
@@ -73,6 +85,31 @@ public class EventsFragment extends Fragment implements OnRecyclerViewItemClickL
 
         //loadEventsFromWebService();
         loadEventsFromFirestore();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        inflater.inflate(R.menu.menu_fragment_events, menu);
+        MenuItem searchItem = menu.findItem(R.id.mnu_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String keyword) {
+
+                eventAdapter.search(keyword);
+
+                return false;
+            }
+        });
+
     }
 
     private void loadEventsFromWebService() {
