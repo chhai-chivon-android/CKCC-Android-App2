@@ -16,7 +16,6 @@ import java.util.List;
 public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewHolder> {
 
     private OnRecyclerViewItemClickListener onRecyclerViewItemClickListener;
-    private Event[] allEvents;
     private Event[] eventsToShow;
 
     public void setOnRecyclerViewItemClickListener(OnRecyclerViewItemClickListener onRecyclerViewItemClickListener) {
@@ -24,7 +23,6 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
     }
 
     public void setEvents(Event[] events) {
-        allEvents = events;
         eventsToShow = events;
         notifyDataSetChanged();
     }
@@ -33,10 +31,10 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventViewH
         return eventsToShow;
     }
 
-    public void search(String keyword){
+    public void search(String keyword) {
         List<Event> foundEvents = new ArrayList<>();
-        for (Event event : allEvents){
-            if(event.getTitle().toLowerCase().contains(keyword.toLowerCase())){
+        for (Event event : Singleton.getInstance().getEvents()) {
+            if (event.getTitle().toLowerCase().contains(keyword.toLowerCase())) {
                 foundEvents.add(event);
             }
         }

@@ -51,6 +51,17 @@
             android:onClick="onEventImageViewClick"
             android:src="@drawable/ic_image_defualt" />
 
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="More Photos" />
+
+        <kh.edu.rupp.ckcc.view.ImagesControllerView
+            android:id="@+id/imgControllerView"
+            android:layout_width="match_parent"
+            android:layout_height="120dp" />
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

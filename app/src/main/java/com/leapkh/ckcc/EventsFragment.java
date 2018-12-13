@@ -79,8 +79,13 @@ public class EventsFragment extends Fragment implements OnRecyclerViewItemClickL
         eventAdapter.setOnRecyclerViewItemClickListener(this);
         recyclerView.setAdapter(eventAdapter);
 
-        //loadEventsFromWebService();
-        loadEventsFromFirestore();
+        if (Singleton.getInstance().getEvents() == null) {
+            //loadEventsFromWebService();
+            loadEventsFromFirestore();
+        } else {
+            eventAdapter.setEvents(Singleton.getInstance().getEvents());
+        }
+        
     }
 
     @Override
@@ -161,8 +166,10 @@ public class EventsFragment extends Fragment implements OnRecyclerViewItemClickL
                     event.setId(documentSnapshot.getId());
                     events[index] = event;
                     index++;
-                };
+                }
+                ;
                 eventAdapter.setEvents(events);
+                Singleton.getInstance().setEvents(events);
             }
         });
 
