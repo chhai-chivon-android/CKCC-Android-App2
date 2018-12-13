@@ -3,6 +3,7 @@
 
     <declare-styleable name="LikeAndShareButton">
         <attr name="view_count" format="integer" />
+        <attr name="show_view_count_label" format="boolean" />
     </declare-styleable>
 
 </resources>
