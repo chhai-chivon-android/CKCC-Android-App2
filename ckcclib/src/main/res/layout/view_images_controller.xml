@@ -8,13 +8,14 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:gravity="center"
+        android:id="@+id/lyt_container"
         android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/img_add_photo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_new_photo" />
+            android:src="@drawable/ic_add_photo"/>
 
     </LinearLayout>
 

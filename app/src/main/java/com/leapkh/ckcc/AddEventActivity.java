@@ -1,21 +1,14 @@
 package com.leapkh.ckcc;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -23,18 +16,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -51,8 +32,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import kh.edu.rupp.ckcc.component.BaseActivity;
+import kh.edu.rupp.ckcc.utility.Utility;
+import kh.edu.rupp.ckcc.view.ImagesControllerView;
+import kh.edu.rupp.ckcc.view.OnImagesControllerViewClickListener;
 
-public class AddEventActivity extends AppCompatActivity {
+
+public class AddEventActivity extends BaseActivity {
 
     private final int GALLERY_REQUEST_CODE = 1;
     private final int MAP_REQUEST_CODE = 2;
@@ -62,6 +48,8 @@ public class AddEventActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private Bitmap selectedImage;
     private EditText etxtAddress;
+
+    private ImagesControllerView imagesControllerView;
 
     private double selectedLat;
     private double selectedLng;
@@ -74,6 +62,16 @@ public class AddEventActivity extends AppCompatActivity {
         imgEvent = findViewById(R.id.img_event);
         progressBar = findViewById(R.id.progressBar);
         etxtAddress = findViewById(R.id.etxt_address);
+
+        imagesControllerView = findViewById(R.id.imgControllerView);
+        imagesControllerView.setOnImagesControllerViewClickListener(new OnImagesControllerViewClickListener() {
+            @Override
+            public void onInsertPhotoClick() {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                startActivityForResult(intent, GALLERY_REQUEST_CODE);
+            }
+        });
     }
 
 
@@ -89,6 +87,12 @@ public class AddEventActivity extends AppCompatActivity {
 
 
     public void onSaveButtonClick(View view) {
+        // Check if there's internet connection
+        if(!isInternetAvailable()){
+            showNoInternetConnectionDialog();
+            return;
+        }
+
         progressBar.setVisibility(View.VISIBLE);
 
         // Upload image to Firebase storage
@@ -207,7 +211,7 @@ public class AddEventActivity extends AppCompatActivity {
         if (requestCode == GALLERY_REQUEST_CODE) {
             try {
                 selectedImage = MediaStore.Images.Media.getBitmap(getContentResolver(), data.getData());
-                imgEvent.setImageBitmap(selectedImage);
+                imagesControllerView.addImage(selectedImage);
             } catch (IOException e) {
                 e.printStackTrace();
             }

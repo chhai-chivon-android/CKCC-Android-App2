@@ -41,7 +41,10 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
 
-public class EventsFragment extends Fragment implements OnRecyclerViewItemClickListener {
+import kh.edu.rupp.ckcc.component.BaseFragment;
+import kh.edu.rupp.ckcc.utility.Utility;
+
+public class EventsFragment extends BaseFragment implements OnRecyclerViewItemClickListener {
 
     private EventsAdapter eventAdapter;
 
@@ -85,7 +88,7 @@ public class EventsFragment extends Fragment implements OnRecyclerViewItemClickL
         } else {
             eventAdapter.setEvents(Singleton.getInstance().getEvents());
         }
-        
+
     }
 
     @Override
@@ -133,6 +136,11 @@ public class EventsFragment extends Fragment implements OnRecyclerViewItemClickL
     }
 
     private void loadEventsFromFirestore() {
+        if (isInternetAvailable()) {
+            showNoInternetConnectionDialog();
+            return;
+        }
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         // Non-realtime query
         /*db.collection("events").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
